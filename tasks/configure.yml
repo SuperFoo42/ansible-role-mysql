@@ -2,7 +2,7 @@
 - name: Get MySQL version
   block:
     - name: Run mysql --version
-      ansible.builtin.command: '{{ mysql_daemon }} --version'
+      ansible.builtin.command: "{{ mysql_daemon }} --version"
       register: mysql_cli_version
       changed_when: false
       check_mode: false
@@ -86,7 +86,7 @@
     - mysql_log | default('') | length > 0
     - mysql_log_error | default('') | length > 0
     - mysql_log_error != 'syslog'
-  tags: ['skip_ansible_galaxy']
+  tags: ["skip_ansible_galaxy"]
 
 - name: Ensure MySQL is started and enabled on boot.
   ansible.builtin.service:
@@ -94,3 +94,11 @@
     state: started
     enabled: "{{ mysql_enabled_on_startup }}"
   register: mysql_service_configuration
+
+- name: Get mysql service status
+  ansible.builtin.command: journalctl -xeu mysql.service
+  register: journalctl_mysql_output
+  tags: always
+- name: Output mysql service status
+  debug: journalctl_mysql_output
+  tags: always
