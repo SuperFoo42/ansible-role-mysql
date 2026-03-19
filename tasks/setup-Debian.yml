@@ -31,15 +31,17 @@
     state: stopped
   when: not mysql_installed.stat.exists
 
-- name: Delete innodb log files and ibdata created by apt package after initial install.
+- name: Remove MySQL datadir to allow clean reinitialization with custom InnoDB settings.
   ansible.builtin.file:
-    path: "{{ mysql_datadir }}/{{ item }}"
+    path: "{{ mysql_datadir }}"
     state: absent
-  with_items:
-    - ib_logfile0
-    - ib_logfile1
-    - ibdata1
-  when: >
-    not mysql_installed.stat.exists
-    and ((ansible_facts.distribution == "Debian" and ansible_facts.distribution_major_version | int < 12)
-    or ansible_facts.distribution == "Ubuntu")
+  when:
+    - not mysql_installed.stat.exists
+    - ansible_facts.os_family == 'Debian'
+
+- name: Set flag to initialize MySQL datadir after config is written.
+  ansible.builtin.set_fact:
+    mysql_initialize_datadir: true
+  when:
+    - not mysql_installed.stat.exists
+    - ansible_facts.os_family == 'Debian'
