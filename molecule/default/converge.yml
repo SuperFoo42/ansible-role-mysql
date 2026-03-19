@@ -4,7 +4,7 @@
   # become: true
 
   roles:
-    - role: geerlingguy.mysql
+    - role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}"
 
   post_tasks:
     - name: Make sure we can connect to MySQL via Unix socket.
