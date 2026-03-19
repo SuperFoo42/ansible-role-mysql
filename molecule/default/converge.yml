@@ -3,6 +3,10 @@
   hosts: all
   # become: true
 
+  vars:
+    mysql_config_include_files:
+      - src: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}/molecule/default/templates/override.cnf"
+
   roles:
     - role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}"
 
